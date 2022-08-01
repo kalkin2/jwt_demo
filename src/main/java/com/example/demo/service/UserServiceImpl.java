@@ -6,16 +6,22 @@ import com.example.demo.repo.RoleRepo;
 import com.example.demo.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepo userRepo;
     private final RoleRepo roleRepo;
@@ -51,5 +57,27 @@ public class UserServiceImpl implements UserService {
     public List<User> getUsers() {
         log.info("모든 유저조회");
         return userRepo.findAll();
+    }
+
+    /**
+     * Spring Security override method.
+     * @param username
+     * @return
+     * @throws UsernameNotFoundException
+     */
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepo.findByUsername(username);
+        if (user == null) {
+            log.error("유저를 찾을 수 없습니다.");
+            throw new UsernameNotFoundException("유저를 찾을 수 없습니다.");
+        } else {
+            log.info("loadUserByUsername: {}", user);
+        }
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        user.getRoles().forEach(role -> {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+        });
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
 }
