@@ -69,8 +69,8 @@ public class UserResource {
                 List<String> roles = user.getRoles().stream().map(Role::getName).toList();
 
                 Map<String, String> tokens = new HashMap<>();
-                tokens.put("access_token", JwtUtil.createAccessToken(user.getUsername(), roles));
-                tokens.put("refresh_token", JwtUtil.createRefreshToken(user.getUsername()));
+                tokens.put("access_token", JwtUtil.createAccessToken(user.getLoginId(), roles));
+                tokens.put("refresh_token", JwtUtil.createRefreshToken(user.getLoginId()));
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
 

@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public void addRoleToUser(String username, String roleName) {
         log.info("권한등록 {} to 유저이름 :{}", roleName, username);
 
-        User user = userRepo.findByUsername(username);
+        User user = userRepo.findByLoginId(username);
         Role role = roleRepo.findByName(roleName);
         user.getRoles().add(role);
     }
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User getUser(String username) {
         log.info("유저조회 : {}", username);
-        return userRepo.findByUsername(username);
+        return userRepo.findByLoginId(username);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepo.findByUsername(username);
+        User user = userRepo.findByLoginId(username);
         if (user == null) {
             log.error("유저를 찾을 수 없습니다.");
             throw new UsernameNotFoundException("유저를 찾을 수 없습니다.");
@@ -81,6 +81,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.getRoles().forEach(role -> {
             authorities.add(new SimpleGrantedAuthority(role.getName()));
         });
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(user.getLoginId(), user.getPassword(), authorities);
     }
 }
