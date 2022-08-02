@@ -37,6 +37,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         log.info("유저네임 :{}, 패스워드 {}", username, password);
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, password);
         return authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        //이후 loadUserByUsername 호출.
     }
 
     @Override
